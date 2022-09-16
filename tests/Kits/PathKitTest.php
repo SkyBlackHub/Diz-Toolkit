@@ -99,6 +99,36 @@ final class PathKitTest extends TestCase
 		$this->assertSame('foo\bar\\', PathKit::removeTrailingDelimiter('foo\bar\\'));
 	}
 
+	/**
+	 * @group current
+	 * @covers PathKit::removeLastSegment
+	 */
+	public function testRemoveLastSegment(): void
+	{
+		$this->assertSame('foo/bar/', PathKit::removeLastSegment('foo/bar/'));
+		$this->assertSame('foo/', PathKit::removeLastSegment('foo/bar'));
+		$this->assertSame('foo', PathKit::removeLastSegment('foo/bar', false));
+		$this->assertSame('', PathKit::removeLastSegment('foo\bar\\'));
+		$this->assertSame(' foo/', PathKit::removeLastSegment(' foo/  bar  '));
+		$this->assertSame('', PathKit::removeLastSegment('foo'));
+		$this->assertSame('', PathKit::removeLastSegment(''));
+	}
+
+	/**
+	 * @group current
+	 * @covers PathKit::removeFirstSegment
+	 */
+	public function testRemoveFirstSegment(): void
+	{
+		$this->assertSame('/foo/bar', PathKit::removeFirstSegment('/foo/bar'));
+		$this->assertSame('/bar', PathKit::removeFirstSegment('foo/bar'));
+		$this->assertSame('bar', PathKit::removeFirstSegment('foo/bar', false));
+		$this->assertSame('', PathKit::removeFirstSegment('foo\bar\\'));
+		$this->assertSame('/  bar  ', PathKit::removeFirstSegment(' foo/  bar  '));
+		$this->assertSame('', PathKit::removeFirstSegment('foo'));
+		$this->assertSame('', PathKit::removeFirstSegment(''));
+	}
+
 	public function testExtend(): void
 	{
 		$this->assertSame('.foo.bar', DotPathKit::normalize(' .. foo... bar   .'));

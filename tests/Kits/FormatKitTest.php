@@ -9,7 +9,6 @@ class FormatKitTest extends TestCase
 {
 	/**
 	 * @covers FormatKit::powerSizeUnits
-	 * @group current
 	 */
 	public function testPowerSizeUnits()
 	{
@@ -19,7 +18,6 @@ class FormatKitTest extends TestCase
 
 	/**
 	 * @covers FormatKit::powerSize
-	 * @group current
 	 */
 	public function testPowerSize()
 	{
@@ -30,7 +28,6 @@ class FormatKitTest extends TestCase
 
 	/**
 	 * @covers FormatKit::binarySize
-	 * @group current
 	 */
 	public function testBinarySize()
 	{
@@ -40,7 +37,6 @@ class FormatKitTest extends TestCase
 
 	/**
 	 * @covers FormatKit::decimalSize
-	 * @group current
 	 */
 	public function testDecimalSize()
 	{

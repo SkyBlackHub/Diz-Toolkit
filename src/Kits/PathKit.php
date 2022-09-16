@@ -101,4 +101,38 @@ class PathKit
 	{
 		return rtrim($path, static::DELIMITER . ' ');
 	}
+
+	/**
+	 * Remove the last segment of the specified path
+	 * @param string $path The target path
+	 * @param bool $keep_delimiter Keep a trailing delimiter
+	 */
+	public static function removeLastSegment(string $path, bool $keep_delimiter = true): string
+	{
+		$position = strrpos($path, static::DELIMITER);
+		if ($position === false) {
+			return '';
+		}
+		if ($keep_delimiter) {
+			$position += strlen(static::DELIMITER);
+		}
+		return substr($path, 0, $position);
+	}
+
+	/**
+	 * Remove the first segment of the specified path
+	 * @param string $path The target path
+	 * @param bool $keep_delimiter Keep a leading delimiter
+	 */
+	public static function removeFirstSegment(string $path, bool $keep_delimiter = true): string
+	{
+		$position = strpos($path, static::DELIMITER);
+		if ($position === false) {
+			return '';
+		}
+		if ($keep_delimiter == false) {
+			$position += strlen(static::DELIMITER);
+		}
+		return substr($path, $position);
+	}
 }
