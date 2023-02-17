@@ -21,6 +21,10 @@ class TraversalIterator implements \Iterator, \Countable
 		return $this->data;
 	}
 
+	/**
+	 * @return mixed
+	 */
+	#[\ReturnTypeWillChange]
 	public function getValue()
 	{
 		$current = current($this->data);
@@ -30,6 +34,10 @@ class TraversalIterator implements \Iterator, \Countable
 		return $current;
 	}
 
+	/**
+	 * @return mixed
+	 */
+	#[\ReturnTypeWillChange]
 	public function getKey()
 	{
 		$current = current($this->data);
@@ -39,6 +47,10 @@ class TraversalIterator implements \Iterator, \Countable
 		return key($this->data);
 	}
 
+	/**
+	 * @return mixed
+	 */
+	#[\ReturnTypeWillChange]
 	public function getOriginKey()
 	{
 		return key($this->data);
@@ -78,6 +90,10 @@ class TraversalIterator implements \Iterator, \Countable
 		return iterator_to_array($this, $preserve_keys);
 	}
 
+	/**
+	 * @return mixed
+	 */
+	#[\ReturnTypeWillChange]
 	public function current()
 	{
 		return $this->getValue();
@@ -95,6 +111,10 @@ class TraversalIterator implements \Iterator, \Countable
 		$this->moveToValid(next($this->data));
 	}
 
+	/**
+	 * @return mixed
+	 */
+	#[\ReturnTypeWillChange]
 	public function key()
 	{
 		return $this->getKey();
