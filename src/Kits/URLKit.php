@@ -6,17 +6,26 @@ use Diz\Toolkit\Tools\Options;
 
 class URLKit
 {
-	public const FALLBACK_HOST = 'localhost';
+	public const FALLBACK_HOST   = 'localhost';
+	public const FALLBACK_SCHEME = 'https';
+
+	// numeric_indices_mode - Keep or drop indices for nested linear arrays in the query
+	public const QUERY_DROP_NUMERIC_INDICES = 0; // foo[1] -> foo[]
+	public const QUERY_KEEP_NUMERIC_INDICES = 1; // foo[1] -> foo[1]
+	public const QUERY_FLAT_NUMERIC_INDICES = 2; // foo[1] -> foo
 
 	/**
 	 * Compose a URL from the specified parts
 	 * @param array $parts Component parts of the URL in a format similar to the parse_url function
+	 * @param array{
+	 *   numeric_indices_mode?: int|null
+	 * } $options Optional settings
 	 */
-	public static function compose(array $parts): string
+	public static function compose(array $parts, array $options = []): string
 	{
 		$parts = new Options($parts);
 
-		$result = $parts->getUsefulString('scheme', 'https') . '://';
+		$result = $parts->getUsefulString('scheme', static::FALLBACK_SCHEME) . '://';
 
 		if ($user = $parts->getUsefulString('user')) {
 			if ($pass = $parts->getUsefulString('pass')) {
@@ -40,7 +49,7 @@ class URLKit
 
 		if ($query = $parts->get('query')) {
 			if (is_array($query)) {
-				$result .= '?' . http_build_query($query);
+				$result .= '?' . static::buildQuery($query, null, $options['numeric_indices_mode'] ?? null);
 			} else if (FilterKit::canBeString($query)) {
 				if ($query = trim($query)) {
 					$result .= '?' . $query;
@@ -98,7 +107,7 @@ class URLKit
 			$base = FilterKit::canBeString($base) ? parse_url($base) : [];
 		}
 		if (isset($target['scheme']) == false) {
-			$target['scheme'] = $base['scheme'] ?? 'https';
+			$target['scheme'] = $base['scheme'] ?? static::FALLBACK_SCHEME;
 		}
 		if (isset($target['host']) == false) {
 			$target['host'] = $base['host'] ?? '';
@@ -130,24 +139,43 @@ class URLKit
 		}, $url);
 	}
 
+	public const DEFAULT_QUERY_NUMERIC_INDICES_MODE = self::QUERY_DROP_NUMERIC_INDICES;
+
 	/**
 	 * Build an HTTP query from the specified data
 	 * This function is similar to http_build_query, but it doesn't encode everything, and optionally doesn't add indices for linear arrays
 	 * @param array $data The target data
 	 * @param string|null $parent The parent key
-	 * @param bool $keep_numeric_indices Keep or remove indices for linear arrays
+	 * @param int|null $numeric_indices_mode Keep or drop indices for nested linear arrays (default: drop)
 	 */
-	public static function buildQuery(array $data, ?string $parent = null, bool $keep_numeric_indices = false): string
+	public static function buildQuery(array $data, ?string $parent = null, ?int $numeric_indices_mode = null): string
 	{
 		$result = [];
 		foreach ($data as $key => $value) {
 			if ($parent) {
-				$key = $parent . '[' . (($keep_numeric_indices == false && is_integer($key)) ? '' : urlencode($key)) . ']';
+				if (is_integer($key)) {
+					switch ($numeric_indices_mode ?? static::DEFAULT_QUERY_NUMERIC_INDICES_MODE) {
+						case static::QUERY_DROP_NUMERIC_INDICES:
+							$key = "{$parent}[]";
+							break;
+
+						case static::QUERY_KEEP_NUMERIC_INDICES:
+							$key = "{$parent}[{$key}]";
+							break;
+
+						case static::QUERY_FLAT_NUMERIC_INDICES:
+							$key = $parent;
+							break;
+					}
+				} else {
+					$key = urlencode($key);
+					$key = "{$parent}[{$key}]";
+				}
 			} else {
 				$key = urlencode($key);
 			}
 			if (is_array($value)) {
-				$result[] = static::buildQuery($value, $key, $keep_numeric_indices);
+				$result[] = static::buildQuery($value, $key, $numeric_indices_mode);
 			} else {
 				$result[] = $key . '=' . urlencode($value);
 			}
