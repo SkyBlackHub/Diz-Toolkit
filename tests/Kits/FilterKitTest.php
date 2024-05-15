@@ -188,4 +188,19 @@ final class FilterKitTest extends TestCase
 		$this->assertEquals($time, FilterKit::toDateTime('25 Dec 2022 12:34:56 Europe/London'));
 		$this->assertNotEquals($time, FilterKit::toDateTime('25 Dec 2022 12:34:56 -0600'));
 	}
+
+	/**
+	 * @covers FilterKit::toObjectArray
+	 */
+	public function testToObjectArray(): void
+	{
+		$a = new class {};
+		$b = new class {};
+		$c = new \Exception();
+
+		$test = [$a, 'foo', $a, $b, $c];
+		$this->assertSame([$a, $a, $b, $c], FilterKit::toObjectArray($test));
+		$this->assertSame([$a, $b, $c], FilterKit::toObjectArray($test, null, true));
+		$this->assertSame([$c], FilterKit::toObjectArray($test, \Exception::class));
+	}
 }

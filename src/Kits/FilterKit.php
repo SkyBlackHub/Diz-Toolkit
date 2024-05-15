@@ -244,6 +244,34 @@ class FilterKit
 	}
 
 	/**
+	 * Convert the passed array to an array of objects
+	 * If a value is not an object or is not an instance of the specified class, it will be filtered out
+	 * @param array $data The target data array
+	 * @param string|null $class Optional class name for filtering
+	 */
+	public static function toObjectArray(array $data, ?string $class = null, bool $unique = false): array
+	{
+		$result = [];
+		if ($class === null) {
+			foreach ($data as $value) {
+				if (is_object($value)) {
+					$result[] = $value;
+				}
+			}
+		} else {
+			foreach ($data as $value) {
+				if ($value instanceof $class) {
+					$result[] = $value;
+				}
+			}
+		}
+		if ($unique) {
+			$result = array_values(array_unique($result, SORT_REGULAR));
+		}
+		return $result;
+	}
+
+	/**
 	 * @internal
 	 */
 	protected static function filterStringArray(array $data, ?callable $callback = null, bool $unique = false, ?int $length = null): array
